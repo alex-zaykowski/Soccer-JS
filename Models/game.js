@@ -1,25 +1,43 @@
-let WIDTH = window.innerWidth;
-let HEIGHT = window.innerHeight;
+const scene = new THREE.Scene();
+scene.add(new THREE.AmbientLight(0x222222));
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(WIDTH, HEIGHT);
-renderer.setClearColor(0xDDDDDD, 1);
-document.body.appendChild(renderer.domElement);
+let light = new THREE.DirectionalLight();
+light.position.set(10,10,10);
+scene.add(light);
 
-let scene = new THREE.Scene();
+let light2 = new THREE.DirectionalLight();
+light2.position.set(-10,0,0);
+scene.add(light2);
 
-let camera = new THREE.PerspectiveCamera(70, WIDTH/HEIGHT);
-camera.position.z = 50;
-scene.add(camera);
+const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
 
-let boxGeometry = new THREE.BoxGeometry(10, 10, 10);
-let basicMaterial = new THREE.MeshBasicMaterial({color: 0x0095DD});
-let cube = new THREE.Mesh(boxGeometry, basicMaterial);
-scene.add(cube);
-cube.rotation.set(0.4, 0.2, 0);
+const loader = new THREE.GLTFLoader();
+loader.load("player.glb", addPlayer);
 
-function render() {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
+let player = new THREE.Object3D();
+function addPlayer(data){
+    player.add(data.scene);
+    player.material = new THREE.MeshPhongMaterial({
+        color: 0xeeb5f5,
+        specular: 0x222222,
+        shininess: 16,
+        flatShading: false
+    });
 }
-render();
+player.scale.set(0.5,0.5,0.5);
+scene.add(player);
+camera.position.z = 5;
+renderer.setClearColor("white");
+
+const animate = function () {
+    requestAnimationFrame( animate );
+
+    player.rotation.y += 0.01;
+
+    renderer.render( scene, camera );
+};
+
+animate();
