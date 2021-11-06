@@ -36,6 +36,7 @@ function addPlayer(data){
     });
 }
 player.scale.set(0.5,0.5,0.5);
+player.rotateY(Math.PI);
 player.position.y = 2;
 
 const ground = new THREE.Mesh(
@@ -48,7 +49,7 @@ const ground = new THREE.Mesh(
 ground.rotateX(Math.PI / 2);
 ground.geometry.scale(10,10,10);
 
-player.add(camera);
+scene.add(camera);
 scene.add(ground);
 scene.add(player);
 
