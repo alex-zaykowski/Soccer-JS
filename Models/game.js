@@ -1,7 +1,9 @@
+//initialize scene and camera
 const scene = new THREE.Scene();
 scene.add(new THREE.AmbientLight(0x222222, 3));
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
+camera.position.z = 5;
+//set up lighting
 let light = new THREE.DirectionalLight();
 light.position.set(10,10,10);
 scene.add(light);
@@ -10,14 +12,19 @@ let light2 = new THREE.DirectionalLight();
 light2.position.set(-10,0,0);
 scene.add(light2);
 
+//set up renderer
 const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setClearColor("white");
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
 const loader = new THREE.GLTFLoader();
 loader.load("player.glb", addPlayer);
 
-let player = new THREE.Object3D();
+//set up player and player velocity
+const player = new THREE.Object3D();
+let velocity = 0;
+
 function addPlayer(data){
     player.add(data.scene);
     player.material = new THREE.MeshPhongMaterial({
@@ -29,14 +36,21 @@ function addPlayer(data){
 }
 player.scale.set(0.5,0.5,0.5);
 scene.add(player);
-camera.position.z = 5;
-renderer.setClearColor("white");
 
+let keyupD = true;
+let keyupA = true;
 const animate = function () {
     requestAnimationFrame( animate );
-
-    player.rotation.y += 0.01;
-
+    if(keyupA && velocity <= 0){
+        velocity += 0.01;
+    }
+    if(keyupD && velocity >= 0){
+        velocity -= 0.01;
+    }
+    if(velocity < 0.01 && velocity > -0.01){
+        velocity = 0;
+    }
+    player.position.x += velocity;
     renderer.render( scene, camera );
 };
 
