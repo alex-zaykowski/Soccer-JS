@@ -26,6 +26,7 @@
 
                 setupGraphics();
                 createBlock();
+                createPlayer();
                 createBall();
                 renderFrame();
 
@@ -157,11 +158,50 @@
                 physicsWorld.addRigidBody( body, colGroupPlane, colGroupRedBall );
             }
 
+            function createPlayer(){
+                let pos = {x: 0, y: 20, z: 5};
+                let quat = {x: 0, y: 0, z: 0, w: 1};
+                let mass = 1;
+
+                let player = new THREE.Mesh(
+                    new THREE.BoxGeometry(2,2,2),
+                    new THREE.MeshPhongMaterial({color: 0xff0505})
+                );
+
+                player.position.set(pos.x, pos.y, pos.z);
+
+                player.castShadow = true;
+                player.receiveShadow = true;
+                scene.add(player);
+
+                //ammo 
+                let transform = new Ammo.btTransform();
+                transform.setIdentity();
+                transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
+                transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
+                let motionState = new Ammo.btDefaultMotionState( transform );
+
+                let colShape = new Ammo.btBoxShape( Ammo.btVector3(2,2,2) );
+                colShape.setMargin( 0.05 );
+
+                let localInertia = new Ammo.btVector3( 0, 0, 0 );
+                colShape.calculateLocalInertia( mass, localInertia );
+
+                let rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, colShape, localInertia );
+                let body = new Ammo.btRigidBody( rbInfo );
+
+
+                physicsWorld.addRigidBody( body, colGroupRedBall, colGroupPlane | colGroupGreenBall );
+                
+                player.userData.physicsBody = body;
+                rigidBodies.push(player);
+            }
+
 
             function createBall(){
                 
                 let pos = {x: 0, y: 20, z: 0};
-                let radius = 2;
+                let radius = 4;
                 let quat = {x: 0, y: 0, z: 0, w: 1};
                 let mass = 1;
 
